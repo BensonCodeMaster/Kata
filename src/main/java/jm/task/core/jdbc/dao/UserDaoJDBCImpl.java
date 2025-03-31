@@ -8,6 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    Connection connection;
+
+    {
+        try {
+             connection = Util.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public UserDaoJDBCImpl() {
 
     }
@@ -22,10 +34,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 ) ENGINE=InnoDB;
                 """;
 
-        try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(createTableSQL);
-            System.out.println("Таблица 'users' успешно создана!");
         } catch (SQLException e) {
             System.err.println("Ошибка при создании таблицы" + e.getMessage());
             e.printStackTrace();
@@ -33,29 +43,23 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        try (Connection connection = Util.getConnection();
-        Statement statement = connection.createStatement()){
+        try (Statement statement = connection.createStatement()){
             statement.executeUpdate("DROP TABLE IF EXISTS users");
-            System.out.println("Таблица 'users' успешно удалена!");
-    } catch (SQLException exception) {
+        } catch (SQLException exception) {
             System.err.println("Ошибка при удалении таблицы!" + exception.getMessage());
             exception.printStackTrace();
+        }
     }
-}
 
     public void saveUser(String name, String lastName, byte age) {
         String insertSQL = "INSERT INTO users (name, lastName, age) VALUES (?,?,?)";
 
-        try(Connection connection = Util.getConnection();
-        PreparedStatement statement = connection.prepareStatement(insertSQL)){
+        try (PreparedStatement statement = connection.prepareStatement(insertSQL)){
             statement.setString(1, name);
             statement.setString(2,lastName);
             statement.setByte(3, age);
 
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected > 0 ){
-                System.out.printf("User %s %s добавлен(а) в базу данных!%n", name, lastName);
-            }
+            statement.executeUpdate();
         } catch (SQLException e ){
             System.out.println("Ошибка при добавлении пользователя: " + e.getMessage());
             e.printStackTrace();
@@ -66,8 +70,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
 
         String insertSQL = "DELETE FROM users WHERE id = ?;";
-        try (Connection connection = Util.getConnection();
-             PreparedStatement statement = connection.prepareStatement(insertSQL)){
+        try (PreparedStatement statement = connection.prepareStatement(insertSQL)){
             statement.setLong(1, id);
             int rowsDeleted = statement.executeUpdate();
             if(rowsDeleted > 0) {
@@ -87,8 +90,7 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         String selectSQL = "SELECT * FROM users";
 
-        try(Connection connection = Util.getConnection();
-        Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectSQL)){
 
             while (resultSet.next()){
@@ -108,14 +110,12 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try(Connection connection = Util.getConnection();
-        Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("TRUNCATE TABLE users");
             System.out.println("Таблица 'users' очищена!");
         } catch (SQLException e){
             System.err.println("Ошибка при очистке таблицы: " + e.getMessage());
             e.printStackTrace();
         }
-
     }
 }

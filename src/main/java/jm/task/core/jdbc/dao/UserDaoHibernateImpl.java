@@ -46,13 +46,11 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
         try (Session session = Util.getSessionFactory().openSession()){
-
             session.beginTransaction();
             User user = new User(name,lastName,age);
             session.save(user);
@@ -73,7 +71,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -97,6 +94,5 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

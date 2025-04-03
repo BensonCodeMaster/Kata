@@ -11,7 +11,6 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
 public class Util {
-    // реализуйте настройку соеденения с БД
 
     private static final String URL = "jdbc:mysql://localhost:3306/mysql";
     private static final String USER = "root";
